@@ -1,0 +1,11 @@
+{
+  "id": "EEGEdu",
+  "title": "EEGEdu",
+  "oneLiner": "An interactive website to learn about brain waves",
+  "demoUrl": "https://eegedu.com/",
+  "screenshot": "https://raw.githubusercontent.com/kylemath/EEGEdu/master/screenshot.png",
+  "kind": "page",
+  "categories": ["eeg", "education", "neuroscience"],
+  "tags": ["eeg", "education", "neuroscience"],
+  "status": "published"
+}

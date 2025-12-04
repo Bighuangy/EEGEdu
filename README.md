@@ -202,3 +202,10 @@ The guide for contributors can be found [here](https://github.com/kylemath/EEGEd
 # License
 
 [EEGEdu is licensed under The MIT License (MIT)](https://github.com/kylemath/EEGEdu/blob/master/LICENSE)
+
+## Preview
+
+<p align="center">
+  <img src="screenshot.png" alt="Project screenshot" width="720" />
+</p>
+
