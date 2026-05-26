@@ -1,205 +1,196 @@
-/* Global Styles for EEGEdu Vue 3 */
+/* EEGEdu Vue 3 - Global Styles */
+
+:root {
+  --color-primary: #5c6ac4;
+  --color-primary-dark: #4c5ab4;
+  --color-success: #50b83c;
+  --color-warning: #f49342;
+  --color-critical: #de3618;
+  --color-info: #47c1bf;
+  --color-background: #f4f6f8;
+  --color-surface: #ffffff;
+  --color-text: #212b36;
+  --color-text-subdued: #637381;
+  --color-border: #dfe3e8;
+}
 
 * {
   box-sizing: border-box;
-}
-
-body {
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+}
+
+html, body {
+  font-family: -apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text);
+  background-color: var(--color-background);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f4f6f8;
 }
 
 #app {
   min-height: 100vh;
 }
 
-/* Element Plus Overrides for Polaris-like styling */
-.el-card {
-  margin-bottom: 16px;
-  border-radius: 3px;
-  box-shadow: 0 0 0 1px rgba(63, 63, 68, 0.05), 0 1px 3px 0 rgba(63, 63, 68, 0.15);
-}
-
-.el-card__header {
-  padding: 16px 20px;
-  border-bottom: 1px solid #e1e3e5;
-  font-weight: 600;
-  font-size: 16px;
-}
-
-.el-card__body {
-  padding: 20px;
-}
-
-/* Slider styling */
-.el-slider {
-  padding: 0 10px;
-}
-
-/* Button styling */
-.el-button--primary {
-  --el-button-bg-color: #5c6ac4;
-  --el-button-border-color: #5c6ac4;
-  --el-button-hover-bg-color: #4959bd;
-  --el-button-hover-border-color: #4959bd;
-}
-
-/* Page container */
+/* Page Container */
 .page-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
 }
 
-/* Chart container */
-.chart-container {
-  position: relative;
-  width: 100%;
-  min-height: 200px;
+/* Card Styles */
+.module-card {
+  background: var(--color-surface);
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px rgba(63,63,68,.05), 0 1px 3px 0 rgba(63,63,68,.15);
+  margin-bottom: 20px;
 }
 
-/* Card section styling */
 .card-section {
-  padding: 16px 0;
-  border-bottom: 1px solid #e1e3e5;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .card-section:last-child {
   border-bottom: none;
 }
 
-/* Text styling */
-.text-container {
-  font-size: 14px;
-  line-height: 1.6;
-  color: #212b36;
-}
-
-.text-container p {
-  margin: 0 0 12px 0;
-}
-
-.text-container p:last-child {
-  margin-bottom: 0;
-}
-
-/* Stack layout (flex) */
-.stack {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.stack--vertical {
-  flex-direction: column;
-  align-items: stretch;
-}
-
-/* Module image */
-.module-image {
+/* Chart Container */
+.chart-container {
+  position: relative;
   width: 100%;
-  max-width: 500px;
-  border-radius: 4px;
-  margin: 16px 0;
+  height: 300px;
+  padding: 10px;
 }
 
-/* Chart responsive */
-canvas {
+.chart-container canvas {
   max-width: 100%;
 }
 
-/* P5 canvas container */
-.p5-container {
+/* Settings Panel */
+.settings-panel {
+  padding: 20px;
+  background: var(--color-background);
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.settings-row {
   display: flex;
-  justify-content: center;
   align-items: center;
-  margin: 16px 0;
-}
-
-.p5-container canvas {
-  border-radius: 4px;
-}
-
-/* Intro card header icon */
-.intro-icon {
-  margin-right: 8px;
-}
-
-/* Status badge */
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 12px;
-  border-radius: 3px;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.status-badge--success {
-  background-color: #bbf7d0;
-  color: #166534;
-}
-
-.status-badge--warning {
-  background-color: #fef3c7;
-  color: #92400e;
-}
-
-.status-badge--error {
-  background-color: #fecaca;
-  color: #991b1b;
-}
-
-/* Grid layout for cards */
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 16px;
+  margin-bottom: 16px;
 }
 
-/* Button group */
+.settings-row:last-child {
+  margin-bottom: 0;
+}
+
+.settings-label {
+  min-width: 120px;
+  color: var(--color-text-subdued);
+  font-weight: 500;
+}
+
+/* Button Group */
 .button-group {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
 }
 
-/* Settings card */
-.settings-card {
-  background: #fff;
-  border-radius: 4px;
-  padding: 16px;
-  margin-bottom: 16px;
+/* Status Indicator */
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 500;
 }
 
-.settings-card__title {
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 12px;
-  color: #212b36;
+.status-indicator.connected {
+  background-color: rgba(80, 184, 60, 0.1);
+  color: var(--color-success);
 }
 
-/* Range slider with value display */
-.range-slider-row {
+.status-indicator.disconnected {
+  background-color: rgba(222, 54, 24, 0.1);
+  color: var(--color-critical);
+}
+
+/* Text Styles */
+.text-subdued {
+  color: var(--color-text-subdued);
+}
+
+.text-success {
+  color: var(--color-success);
+}
+
+.text-warning {
+  color: var(--color-warning);
+}
+
+.text-critical {
+  color: var(--color-critical);
+}
+
+/* Module Header */
+.module-header {
   display: flex;
   align-items: center;
-  gap: 16px;
+  justify-content: space-between;
+  padding: 20px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
 }
 
-.range-slider-row .el-slider {
-  flex: 1;
+.module-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--color-text);
 }
 
-.range-slider-row .value-display {
-  min-width: 60px;
-  text-align: right;
-  font-size: 14px;
-  color: #637381;
+/* Intro Module Styles */
+.intro-content {
+  padding: 20px;
+}
+
+.intro-section {
+  margin-bottom: 32px;
+}
+
+.intro-section h3 {
+  font-size: 18px;
+  margin-bottom: 12px;
+  color: var(--color-text);
+}
+
+.intro-section p {
+  color: var(--color-text-subdued);
+  line-height: 1.6;
+}
+
+.intro-image {
+  max-width: 100%;
+  border-radius: 8px;
+  margin: 16px 0;
+}
+
+/* P5 Canvas Container */
+.p5-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #000;
+  border-radius: 8px;
+  overflow: hidden;
+  min-height: 400px;
 }
 
 /* Responsive */
@@ -208,11 +199,55 @@ canvas {
     padding: 12px;
   }
   
-  .card-grid {
-    grid-template-columns: 1fr;
+  .settings-row {
+    flex-direction: column;
+    align-items: flex-start;
   }
   
-  .stack {
-    flex-wrap: wrap;
+  .settings-label {
+    min-width: auto;
   }
+  
+  .chart-container {
+    height: 250px;
+  }
+}
+
+/* Element Plus Overrides */
+.el-card {
+  margin-bottom: 20px;
+}
+
+.el-slider {
+  flex: 1;
+}
+
+.el-select {
+  min-width: 200px;
+}
+
+/* Transitions */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.slide-enter-active,
+.slide-leave-active {
+  transition: all 0.3s ease;
+}
+
+.slide-enter-from {
+  transform: translateX(-20px);
+  opacity: 0;
+}
+
+.slide-leave-to {
+  transform: translateX(20px);
+  opacity: 0;
 }

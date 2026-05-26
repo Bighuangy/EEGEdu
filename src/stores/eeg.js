@@ -1,130 +1,193 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { MuseClient } from 'muse-js'
 
 export const useEegStore = defineStore('eeg', () => {
-  // Connection state
-  const source = ref(null)
-  const status = ref('Connect')
-  const debugWithMock = ref(false)
-  const enableAux = ref(false)
+  // State
+  const client = ref(null)
+  const connected = ref(false)
+  const connecting = ref(false)
+  const status = ref('disconnected') // 'disconnected' | 'connecting' | 'connected'
+  const deviceName = ref('')
+  const batteryLevel = ref(0)
   
-  // Computed channel count
-  const nchans = computed(() => enableAux.value ? 5 : 4)
-  
-  // Module data (reactive data pulled from observables)
-  const moduleData = ref({
-    intro: { ch0: { datasets: [{}] }, ch1: { datasets: [{}] }, ch2: { datasets: [{}] }, ch3: { datasets: [{}] }, ch4: { datasets: [{}] } },
-    heartRaw: { ch0: { datasets: [{}] }, ch1: { datasets: [{}] }, ch2: { datasets: [{}] }, ch3: { datasets: [{}] }, ch4: { datasets: [{}] } },
-    heartSpectra: { ch0: { datasets: [{}] }, ch1: { datasets: [{}] }, ch2: { datasets: [{}] }, ch3: { datasets: [{}] }, ch4: { datasets: [{}] } },
-    raw: { ch0: { datasets: [{}] }, ch1: { datasets: [{}] }, ch2: { datasets: [{}] }, ch3: { datasets: [{}] }, ch4: { datasets: [{}] } },
-    spectra: { ch0: { datasets: [{}] }, ch1: { datasets: [{}] }, ch2: { datasets: [{}] }, ch3: { datasets: [{}] }, ch4: { datasets: [{}] } },
-    bands: { ch0: { datasets: [{}] }, ch1: { datasets: [{}] }, ch2: { datasets: [{}] }, ch3: { datasets: [{}] }, ch4: { datasets: [{}] } },
-    animate: { ch0: { datasets: [{}] }, ch1: { datasets: [{}] }, ch2: { datasets: [{}] }, ch3: { datasets: [{}] }, ch4: { datasets: [{}] } },
-    spectro: { ch0: { datasets: [{}] }, ch1: { datasets: [{}] }, ch2: { datasets: [{}] }, ch3: { datasets: [{}] }, ch4: { datasets: [{}] } },
-    alpha: { ch0: { datasets: [{}] }, ch1: { datasets: [{}] }, ch2: { datasets: [{}] }, ch3: { datasets: [{}] }, ch4: { datasets: [{}] } },
-    ssvep: { ch0: { datasets: [{}] }, ch1: { datasets: [{}] }, ch2: { datasets: [{}] }, ch3: { datasets: [{}] }, ch4: { datasets: [{}] } },
-    evoked: { ch0: { datasets: [{}] }, ch1: { datasets: [{}] }, ch2: { datasets: [{}] }, ch3: { datasets: [{}] }, ch4: { datasets: [{}] } },
-    predict: { ch0: { datasets: [{}] }, ch1: { datasets: [{}] }, ch2: { datasets: [{}] }, ch3: { datasets: [{}] }, ch4: { datasets: [{}] } }
+  // Raw EEG data channels
+  const rawData = ref({
+    ch0: [], // TP9 (left ear)
+    ch1: [], // AF7 (left forehead)
+    ch2: [], // AF8 (right forehead)
+    ch3: [], // TP10 (right ear)
+    aux: []  // auxiliary
   })
   
-  // RxJS observables and subscriptions (stored but not reactive)
-  const pipes = {}
-  const multicasts = {}
-  const subscriptions = {}
+  // PPG (Heart) data
+  const ppgData = ref({
+    ambient: [],
+    infrared: [],
+    red: []
+  })
+  
+  // Accelerometer data
+  const accelerometerData = ref({
+    x: [],
+    y: [],
+    z: []
+  })
+  
+  // Gyroscope data
+  const gyroscopeData = ref({
+    x: [],
+    y: [],
+    z: []
+  })
+  
+  // Processed data
+  const spectraData = ref({
+    ch0: [],
+    ch1: [],
+    ch2: [],
+    ch3: []
+  })
+  
+  const bandsData = ref({
+    delta: { ch0: 0, ch1: 0, ch2: 0, ch3: 0 },
+    theta: { ch0: 0, ch1: 0, ch2: 0, ch3: 0 },
+    alpha: { ch0: 0, ch1: 0, ch2: 0, ch3: 0 },
+    beta: { ch0: 0, ch1: 0, ch2: 0, ch3: 0 },
+    gamma: { ch0: 0, ch1: 0, ch2: 0, ch3: 0 }
+  })
+  
+  // Subscriptions
+  const subscriptions = ref([])
+  
+  // Computed
+  const isConnected = computed(() => status.value === 'connected')
+  const isConnecting = computed(() => status.value === 'connecting')
   
   // Actions
-  function setSource(newSource) {
-    source.value = newSource
-  }
-  
-  function setStatus(newStatus) {
-    status.value = newStatus
-  }
-  
-  function setDebugWithMock(value) {
-    debugWithMock.value = value
-  }
-  
-  function setEnableAux(value) {
-    enableAux.value = value
-  }
-  
-  function setModuleData(moduleName, data) {
-    moduleData.value[moduleName] = data
-  }
-  
-  function setPipe(name, pipe) {
-    pipes[name] = pipe
-  }
-  
-  function setMulticast(name, multicast) {
-    multicasts[name] = multicast
-  }
-  
-  function setSubscription(name, subscription) {
-    subscriptions[name] = subscription
-  }
-  
-  function unsubscribe(name) {
-    if (subscriptions[name]) {
-      subscriptions[name].unsubscribe()
-      subscriptions[name] = null
+  async function connect() {
+    if (connecting.value || connected.value) return
+    
+    try {
+      connecting.value = true
+      status.value = 'connecting'
+      
+      const museClient = new MuseClient()
+      await museClient.connect()
+      await museClient.start()
+      
+      client.value = museClient
+      connected.value = true
+      status.value = 'connected'
+      deviceName.value = museClient.deviceName || 'Muse'
+      
+      // Get battery level
+      museClient.telemetryData.subscribe(telemetry => {
+        batteryLevel.value = telemetry.batteryLevel
+      })
+      
+      return museClient
+    } catch (error) {
+      console.error('EEG connection error:', error)
+      status.value = 'disconnected'
+      throw error
+    } finally {
+      connecting.value = false
     }
   }
   
-  function unsubscribeAll() {
-    Object.keys(subscriptions).forEach(name => {
-      if (subscriptions[name]) {
-        subscriptions[name].unsubscribe()
-        subscriptions[name] = null
+  async function disconnect() {
+    // Unsubscribe all
+    subscriptions.value.forEach(sub => {
+      if (sub && typeof sub.unsubscribe === 'function') {
+        sub.unsubscribe()
       }
     })
+    subscriptions.value = []
+    
+    // Disconnect client
+    if (client.value) {
+      try {
+        await client.value.disconnect()
+      } catch (e) {
+        console.warn('Disconnect error:', e)
+      }
+      client.value = null
+    }
+    
+    connected.value = false
+    status.value = 'disconnected'
+    deviceName.value = ''
+    batteryLevel.value = 0
+    
+    // Clear data
+    clearData()
   }
   
-  function getPipe(name) {
-    return pipes[name]
+  function clearData() {
+    rawData.value = { ch0: [], ch1: [], ch2: [], ch3: [], aux: [] }
+    ppgData.value = { ambient: [], infrared: [], red: [] }
+    accelerometerData.value = { x: [], y: [], z: [] }
+    gyroscopeData.value = { x: [], y: [], z: [] }
+    spectraData.value = { ch0: [], ch1: [], ch2: [], ch3: [] }
+    bandsData.value = {
+      delta: { ch0: 0, ch1: 0, ch2: 0, ch3: 0 },
+      theta: { ch0: 0, ch1: 0, ch2: 0, ch3: 0 },
+      alpha: { ch0: 0, ch1: 0, ch2: 0, ch3: 0 },
+      beta: { ch0: 0, ch1: 0, ch2: 0, ch3: 0 },
+      gamma: { ch0: 0, ch1: 0, ch2: 0, ch3: 0 }
+    }
   }
   
-  function getMulticast(name) {
-    return multicasts[name]
+  function addSubscription(subscription) {
+    subscriptions.value.push(subscription)
   }
   
-  function getSubscription(name) {
-    return subscriptions[name]
+  function updateRawData(channelIndex, data) {
+    const key = channelIndex === 4 ? 'aux' : `ch${channelIndex}`
+    rawData.value[key] = data
   }
   
-  function reset() {
-    unsubscribeAll()
-    source.value = null
-    status.value = 'Connect'
-    debugWithMock.value = false
+  function updatePpgData(type, data) {
+    ppgData.value[type] = data
+  }
+  
+  function updateSpectraData(channelIndex, data) {
+    spectraData.value[`ch${channelIndex}`] = data
+  }
+  
+  function updateBandsData(band, channelData) {
+    bandsData.value[band] = channelData
   }
   
   return {
     // State
-    source,
+    client,
+    connected,
+    connecting,
     status,
-    debugWithMock,
-    enableAux,
-    nchans,
-    moduleData,
-    pipes,
-    multicasts,
+    deviceName,
+    batteryLevel,
+    rawData,
+    ppgData,
+    accelerometerData,
+    gyroscopeData,
+    spectraData,
+    bandsData,
     subscriptions,
+    
+    // Computed
+    isConnected,
+    isConnecting,
+    
     // Actions
-    setSource,
-    setStatus,
-    setDebugWithMock,
-    setEnableAux,
-    setModuleData,
-    setPipe,
-    setMulticast,
-    setSubscription,
-    unsubscribe,
-    unsubscribeAll,
-    getPipe,
-    getMulticast,
-    getSubscription,
-    reset
+    connect,
+    disconnect,
+    clearData,
+    addSubscription,
+    updateRawData,
+    updatePpgData,
+    updateSpectraData,
+    updateBandsData
   }
 })

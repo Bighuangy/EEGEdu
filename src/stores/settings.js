@@ -1,202 +1,188 @@
 import { defineStore } from 'pinia'
-import { ref, reactive } from 'vue'
+import { ref, computed } from 'vue'
+
+// Module definitions - same order as original
+export const moduleNames = {
+  INTRO: 'intro',
+  HEART_RAW: 'heartRaw',
+  HEART_SPECTRA: 'heartSpectra',
+  RAW: 'raw',
+  SPECTRA: 'spectra',
+  BANDS: 'bands',
+  ANIMATE: 'animate',
+  SPECTRO: 'spectro',
+  ALPHA: 'alpha',
+  SSVEP: 'ssvep',
+  EVOKED: 'evoked',
+  PREDICT: 'predict'
+}
+
+export const moduleList = [
+  { key: moduleNames.INTRO, title: 'Introduction', icon: 'InfoFilled' },
+  { key: moduleNames.HEART_RAW, title: 'Heart (Raw)', icon: 'TrendCharts' },
+  { key: moduleNames.HEART_SPECTRA, title: 'Heart (Spectra)', icon: 'DataLine' },
+  { key: moduleNames.RAW, title: 'Raw', icon: 'TrendCharts' },
+  { key: moduleNames.SPECTRA, title: 'Spectra', icon: 'DataLine' },
+  { key: moduleNames.BANDS, title: 'Bands', icon: 'Histogram' },
+  { key: moduleNames.ANIMATE, title: 'Animate', icon: 'VideoPlay' },
+  { key: moduleNames.SPECTRO, title: 'Spectrogram', icon: 'PictureFilled' },
+  { key: moduleNames.ALPHA, title: 'Alpha', icon: 'View' },
+  { key: moduleNames.SSVEP, title: 'SSVEP', icon: 'MagicStick' },
+  { key: moduleNames.EVOKED, title: 'Evoked', icon: 'Lightning' },
+  { key: moduleNames.PREDICT, title: 'Predict', icon: 'cpu' }
+]
 
 export const useSettingsStore = defineStore('settings', () => {
-  // Current selected module
-  const selectedModule = ref('intro')
+  // Current module
+  const currentModule = ref(moduleNames.INTRO)
   
-  // Recording state
-  const recordPop = ref(false)
-  const recordTwoPop = ref(false)
+  // General settings
+  const sampleRate = ref(256) // Muse default sample rate
+  const duration = ref(256) // Number of samples to display
+  const interval = ref(1) // Update interval in samples
+  const filterEnabled = ref(true)
+  const cutOffLow = ref(2) // Low cutoff frequency
+  const cutOffHigh = ref(50) // High cutoff frequency
+  const nbChannels = ref(4) // Number of EEG channels
   
-  // Module settings with default values
-  const moduleSettings = reactive({
-    intro: {
-      cutOffLow: 2,
-      cutOffHigh: 20,
-      interval: 100,
-      srate: 256,
-      duration: 1024,
-      name: 'intro'
-    },
-    heartRaw: {
-      cutOffLow: 0.1,
-      cutOffHigh: 30,
-      interval: 50,
-      srate: 256,
-      duration: 1024,
-      name: 'heartRaw'
-    },
-    heartSpectra: {
-      cutOffLow: 0.1,
-      cutOffHigh: 30,
-      interval: 50,
-      srate: 256,
-      duration: 1024,
-      bins: 256,
-      sliceFFTLow: 0,
-      sliceFFTHigh: 15,
-      name: 'heartSpectra'
-    },
-    raw: {
-      cutOffLow: 2,
-      cutOffHigh: 20,
-      interval: 100,
-      srate: 256,
-      duration: 1024,
-      name: 'raw'
-    },
-    spectra: {
-      cutOffLow: 1,
-      cutOffHigh: 30,
-      interval: 100,
-      srate: 256,
-      duration: 1024,
-      bins: 256,
-      sliceFFTLow: 1,
-      sliceFFTHigh: 30,
-      name: 'spectra'
-    },
-    bands: {
-      cutOffLow: 1,
-      cutOffHigh: 50,
-      interval: 100,
-      srate: 256,
-      duration: 1024,
-      bins: 256,
-      name: 'bands'
-    },
-    animate: {
-      cutOffLow: 1,
-      cutOffHigh: 50,
-      interval: 100,
-      srate: 256,
-      duration: 1024,
-      bins: 256,
-      name: 'animate'
-    },
-    spectro: {
-      cutOffLow: 1,
-      cutOffHigh: 50,
-      interval: 100,
-      srate: 256,
-      duration: 1024,
-      bins: 256,
-      sliceFFTLow: 1,
-      sliceFFTHigh: 50,
-      name: 'spectro'
-    },
-    alpha: {
-      cutOffLow: 1,
-      cutOffHigh: 30,
-      interval: 100,
-      srate: 256,
-      duration: 1024,
-      bins: 256,
-      sliceFFTLow: 1,
-      sliceFFTHigh: 30,
-      name: 'alpha'
-    },
-    ssvep: {
-      cutOffLow: 1,
-      cutOffHigh: 50,
-      interval: 100,
-      srate: 256,
-      duration: 1024,
-      bins: 256,
-      sliceFFTLow: 1,
-      sliceFFTHigh: 30,
-      name: 'ssvep'
-    },
-    evoked: {
-      cutOffLow: 0.1,
-      cutOffHigh: 30,
-      interval: 50,
-      srate: 256,
-      duration: 768,
-      name: 'evoked'
-    },
-    predict: {
-      cutOffLow: 1,
-      cutOffHigh: 50,
-      interval: 100,
-      srate: 256,
-      duration: 1024,
-      bins: 256,
-      name: 'predict'
-    }
+  // Chart settings
+  const chartTheme = ref('dark') // 'dark' | 'light'
+  const showAllChannels = ref(true)
+  const selectedChannel = ref(0)
+  
+  // Spectra settings
+  const nfft = ref(256) // FFT size
+  const sliceFFTLow = ref(1) // Low frequency display
+  const sliceFFTHigh = ref(50) // High frequency display
+  const bins = ref(256)
+  
+  // Bands settings
+  const bandRanges = ref({
+    delta: [1, 4],
+    theta: [4, 8],
+    alpha: [8, 13],
+    beta: [13, 30],
+    gamma: [30, 50]
   })
   
-  // Module types list
-  const moduleTypes = [
-    { label: '1. Introduction', value: 'intro' },
-    { label: '2. Electrocardiogram (Heart beats)', value: 'heartRaw' },
-    { label: '3. Heart Rate (Beats per minute)', value: 'heartSpectra' },
-    { label: '4. Raw and Filtered Data', value: 'raw' },
-    { label: '5. Frequency Spectra', value: 'spectra' },
-    { label: '6. Frequency Bands', value: 'bands' },
-    { label: '7. Brain Controlled Animation', value: 'animate' },
-    { label: '8. Spectrogram (spectra over time)', value: 'spectro' },
-    { label: '9. Eyes open vs. Eyes closed Experiment', value: 'alpha' },
-    { label: '10. Steady-State Visual Evoked Potential (SSVEP) Experiment', value: 'ssvep' },
-    { label: '11. Stimulus Evoked Event-related potential (ERP)', value: 'evoked' },
-    { label: '12. Predict brain states with a trained classifier', value: 'predict' }
-  ]
+  // Animate settings
+  const animationType = ref('bands') // 'bands' | 'cube' | 'draw' | 'flock' | 'flock3d' | 'tone'
+  const animationSpeed = ref(1)
   
-  // Modules that show aux channel option
-  const modulesWithAux = ['raw', 'spectra', 'bands', 'alpha', 'ssvep', 'evoked']
+  // Spectrogram settings
+  const spectroColorMap = ref('plasma')
+  const spectroScale = ref('linear')
+  
+  // Alpha settings
+  const alphaThreshold = ref(0.5)
+  const eyesClosedDuration = ref(3000) // ms
+  
+  // SSVEP settings
+  const ssvepFrequencyFast = ref(15) // Hz
+  const ssvepFrequencySlow = ref(10) // Hz
+  const ssvepTestDuration = ref(10000) // ms
+  
+  // Evoked settings
+  const evokedStimDuration = ref(100) // ms
+  const evokedTrials = ref(20)
+  const evokedInterval = ref(2000) // ms
+  
+  // Predict settings
+  const predictModel = ref('knn') // 'knn' | 'nn'
+  const predictEpochs = ref(50)
+  const predictK = ref(3)
+  const predictionLabels = ref(['Relaxed', 'Focused'])
+  
+  // Module-specific settings
+  const moduleSettings = ref({})
+  
+  // Computed
+  const currentModuleInfo = computed(() => {
+    return moduleList.find(m => m.key === currentModule.value) || moduleList[0]
+  })
   
   // Actions
-  function setSelectedModule(module) {
-    selectedModule.value = module
+  function setModule(moduleName) {
+    if (moduleList.some(m => m.key === moduleName)) {
+      currentModule.value = moduleName
+    }
   }
   
-  function setRecordPop(value) {
-    recordPop.value = value
-  }
-  
-  function toggleRecordPop() {
-    recordPop.value = !recordPop.value
-  }
-  
-  function setRecordTwoPop(value) {
-    recordTwoPop.value = value
-  }
-  
-  function toggleRecordTwoPop() {
-    recordTwoPop.value = !recordTwoPop.value
+  function updateSetting(key, value) {
+    if (key in this) {
+      this[key] = value
+    }
   }
   
   function updateModuleSettings(moduleName, settings) {
-    if (moduleSettings[moduleName]) {
-      Object.assign(moduleSettings[moduleName], settings)
+    moduleSettings.value[moduleName] = {
+      ...moduleSettings.value[moduleName],
+      ...settings
     }
   }
   
   function getModuleSettings(moduleName) {
-    return moduleSettings[moduleName] || {}
+    return moduleSettings.value[moduleName] || {}
   }
   
-  function showAuxOption(moduleName) {
-    return modulesWithAux.includes(moduleName)
+  function resetToDefaults() {
+    sampleRate.value = 256
+    duration.value = 256
+    interval.value = 1
+    filterEnabled.value = true
+    cutOffLow.value = 2
+    cutOffHigh.value = 50
+    nbChannels.value = 4
+    nfft.value = 256
+    sliceFFTLow.value = 1
+    sliceFFTHigh.value = 50
+    bins.value = 256
   }
   
   return {
     // State
-    selectedModule,
-    recordPop,
-    recordTwoPop,
+    currentModule,
+    sampleRate,
+    duration,
+    interval,
+    filterEnabled,
+    cutOffLow,
+    cutOffHigh,
+    nbChannels,
+    chartTheme,
+    showAllChannels,
+    selectedChannel,
+    nfft,
+    sliceFFTLow,
+    sliceFFTHigh,
+    bins,
+    bandRanges,
+    animationType,
+    animationSpeed,
+    spectroColorMap,
+    spectroScale,
+    alphaThreshold,
+    eyesClosedDuration,
+    ssvepFrequencyFast,
+    ssvepFrequencySlow,
+    ssvepTestDuration,
+    evokedStimDuration,
+    evokedTrials,
+    evokedInterval,
+    predictModel,
+    predictEpochs,
+    predictK,
+    predictionLabels,
     moduleSettings,
-    moduleTypes,
-    modulesWithAux,
+    
+    // Computed
+    currentModuleInfo,
+    
     // Actions
-    setSelectedModule,
-    setRecordPop,
-    toggleRecordPop,
-    setRecordTwoPop,
-    toggleRecordTwoPop,
+    setModule,
+    updateSetting,
     updateModuleSettings,
     getModuleSettings,
-    showAuxOption
+    resetToDefaults
   }
 })
