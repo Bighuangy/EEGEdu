@@ -1,0 +1,54 @@
+{
+  "name": "vue3-eegedu",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "@neurosity/pipes": "^3.0.2",
+    "chart.js": "^2.9.4",
+    "core-js": "^3.8.3",
+    "element-plus": "^2.3.14",
+    "file-saver": "^2.0.5",
+    "ml5": "^0.4.3",
+    "muse-js": "^3.0.1",
+    "p5": "^1.4.2",
+    "rxjs": "^6.6.7",
+    "vue": "^3.2.47",
+    "vue-chartjs": "^3.5.1",
+    "vue-router": "^4.1.6"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~5.0.0",
+    "@vue/cli-plugin-eslint": "~5.0.0",
+    "@vue/cli-service": "~5.0.0",
+    "eslint": "^7.32.0",
+    "eslint-plugin-vue": "^8.0.3"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/vue3-essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "@babel/eslint-parser"
+    },
+    "rules": {}
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "not ie 11"
+  ],
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
