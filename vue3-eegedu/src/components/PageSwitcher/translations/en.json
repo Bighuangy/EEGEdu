@@ -1,0 +1,10 @@
+{
+  "connect": "Connect",
+  "connecting": "Connecting...",
+  "connected": "Connected",
+  "connectMock": "Connect Mock",
+  "connectingMock": "Connecting Mock...",
+  "connectedMock": "Mock Connected",
+  "disconnect": "Disconnect",
+  "channel": "Channel: "
+}
